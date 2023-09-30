@@ -55,8 +55,8 @@ def recommendation_system(user_input):
             result_dataframe = pandas.DataFrame(result)
             print(result_dataframe)
         except:
-            for i in input
-            result_dataframe = dataframe[dataframe['Simplified_Title'].str.contains(i)]
+            
+            result_dataframe = dataframe[dataframe['Simplified_Title'].str.contains(user_input, build)]
             result_dataframe_series = pandas.Series(result_dataframe.index, index=result_dataframe['course_title_l']).drop_duplicates()
             try:
                 id = result_dataframe_series.iloc[0]
