@@ -38,14 +38,14 @@ def data_simlifier(dataframe):
 #Recommendation system based on keyword extraction
 def keyword_recc_system(user_input, dataframe,csv):
     dataframe = data_simlifier(dataframe)
-
+    user_input = user_input.lower()
 
     kw_model = keybert_loader()
     keywords_user = kw_model.extract_keywords(user_input, keyphrase_ngram_range=(1,3), stop_words="english", highlight =False, top_n=10)
     user_input_list = list(dict(keywords_user).keys())
             
 
-    matched_keywords= {"course_title":[],"matched_values" :[]}            
+    matched_keywords= {"course_title":[],"matched_values" :[],"URL":[]}            
 
     for skeywords in dataframe['keywords']:
     
@@ -63,66 +63,45 @@ def keyword_recc_system(user_input, dataframe,csv):
                 title_index = dataframe.index[dataframe["keywords"] == str(keywords_list)].tolist()
             
                 title_index = title_index[0]
-                title = dataframe.loc[title_index,"course_title_l"]
+                title = dataframe.loc[title_index,"course_title"]
+                link = dataframe.loc[title_index, "url"]
             
            
                 matched_keywords["course_title"].append(title)
                 matched_keywords["matched_values"].append(matched_values)
+                matched_keywords["URL"].append(link)
 
-    result_dataframe = (pandas.DataFrame(matched_keywords)).sort_values(by=["matched_values"], ascending=False)
-    print(result_dataframe)
-    return result_dataframe
-
-
-
-
-#Recommendation system based on cosine similarity matrix
-
-#def cos_mat_recc_sys(dataframe, user_input,csv):
-    #Text Vectorization Process
-    cvector = CountVectorizer()
-    cvector_matrix = cvector.fit_transform(dataframe['Simplified_Title'])
-
-    #building cosine similarity matrix
-    cossim_matrix = cosine_similarity(cvector_matrix)
-    #Getting course id
-    course_id = pandas.Series(dataframe.index, index=dataframe['course_title']).drop_duplicates()
-
-    #Check is user input is empty
-    if user_input =='':
-        user_input = None
-    
-    #Get course id
-    if user_input is not None:
-        try:
-
-            user_input = user_input.lower()
-            id = course_id[user_input]
-
-            #create similarity index for each course and sorting from highest to lowest
-            sim_index = list(enumerate(cossim_matrix[id]))
-            sorted_sindex = sorted(sim_index, key=lambda x:x[1],reverse = True)
-            sorted_sindex[1:]
-
-            #Picking Final courses to be displayed:
-            final_courses = [i[0] for i in sorted_sindex[1:]]
-            
                 
-            #final result
-            result = dataframe['course_title_l'].iloc[final_courses]
-            result_dataframe = pandas.DataFrame(result)
-            print(result_dataframe)
-        except:
-            result_dataframe = keyword_recc_system(user_input, dataframe, csv)
-            
-    return result_dataframe  
 
 
-user_input = input("Type here:")
+    #result_dataframe = (pandas.DataFrame(matched_keywords)).sort_values(by=["matched_values"], ascending=False)
+    result_dataframe = (pandas.DataFrame(matched_keywords)).sort_values(by=["matched_values"], ascending=False)
+    
+    return result_dataframe[["course_title","URL"]]
+
+
+
+
+ 
+
+
+
 csv = "courses_with_keywords_test.csv"
 dataframe = csv_reader(csv)
 
-keyword_recc_system(user_input,dataframe,csv)
+
+
+
+
+#Website
+sweb.title("College Course Recommendation System")
+user_input = sweb.text_area("What do you want to learn?")
+
+clicked = sweb.button("Search")
+
+if clicked == True:
+    dataframe = keyword_recc_system(user_input,dataframe,csv)
+    dataframe
 
 
 
