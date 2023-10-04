@@ -1,12 +1,17 @@
 #Import all required modules
-import pandas
-import neattext.functions as nt_func
-import numpy
-from sklearn.metrics.pairwise import cosine_similarity, linear_kernel
-from sklearn.feature_extraction.text import CountVectorizer,TfidfVectorizer
-from keybert import KeyBERT
 import streamlit as sweb
 import streamlit.components.v1 as sweb_items
+
+
+
+#Website
+sweb.title("College Course Recommendation System")
+user_input = sweb.text_area("What do you want to learn?")
+clicked = sweb.button("Search")
+
+import pandas
+import neattext.functions as nt_func
+from keybert import KeyBERT
 
 #Loads keybert model for extraction of keywords
 def keybert_loader():
@@ -45,7 +50,7 @@ def keyword_recc_system(user_input, dataframe,csv):
     user_input_list = list(dict(keywords_user).keys())
             
 
-    matched_keywords= {"course_title":[],"matched_values" :[],"URL":[]}            
+    matched_keywords= {"Course Title":[],"matched_values" :[],"URL":[],"Price":[]}            
 
     for skeywords in dataframe['keywords']:
     
@@ -65,19 +70,34 @@ def keyword_recc_system(user_input, dataframe,csv):
                 title_index = title_index[0]
                 title = dataframe.loc[title_index,"course_title"]
                 link = dataframe.loc[title_index, "url"]
+                price = dataframe.loc[title_index, "price"]
             
            
-                matched_keywords["course_title"].append(title)
+                matched_keywords["Course Title"].append(title)
                 matched_keywords["matched_values"].append(matched_values)
                 matched_keywords["URL"].append(link)
+                matched_keywords["Price"].append(price)
+                                 
+
+
 
                 
 
 
     #result_dataframe = (pandas.DataFrame(matched_keywords)).sort_values(by=["matched_values"], ascending=False)
     result_dataframe = (pandas.DataFrame(matched_keywords)).sort_values(by=["matched_values"], ascending=False)
+    i = 1
+    for row in result_dataframe.iterrows():
+        
+        Title = row[1][0]
+        sweb.write(i,". ",Title)
+        Url = row[1][2]
+        sweb.write("Url:",Url)
+        Price = row[1][3]
+        sweb.write("Price: ",Price,"$")
+        sweb.write("")
+        i+=1
     
-    return result_dataframe[["course_title","URL"]]
 
 
 
@@ -93,11 +113,8 @@ dataframe = csv_reader(csv)
 
 
 
-#Website
-sweb.title("College Course Recommendation System")
-user_input = sweb.text_area("What do you want to learn?")
 
-clicked = sweb.button("Search")
+
 
 if clicked == True:
     dataframe = keyword_recc_system(user_input,dataframe,csv)
