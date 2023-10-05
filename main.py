@@ -76,24 +76,35 @@ def keyword_recc_system(user_input, dataframe,csv):
     
 
 
-
+        global title
+        title = ""
+        global link
+        link = ""
+        global price
+        price = ""
+        
+        mkeyword = []
                 
         for keyword in user_input_list:
-            if keyword in keywords_list:
-                matched_values+=1
-                title_index = dataframe.index[dataframe["keywords"] == str(keywords_list)].tolist()
-            
-                title_index = title_index[0]
-                title = dataframe.loc[title_index,"course_title"]
-                link = dataframe.loc[title_index, "url"]
-                price = dataframe.loc[title_index, "price"]
-            
-           
-                matched_keywords["Course Title"].append(title)
-                matched_keywords["matched_values"].append(matched_values)
-                matched_keywords["URL"].append(link)
-                matched_keywords["Price"].append(price)
-                matched_keywords["matched_keywords"].append([keyword])
+            for skeyword in keywords_list:
+                if skeyword == keyword:
+                    print(skeyword, keyword)
+                    matched_values+=1
+                    title_index = dataframe.index[dataframe["keywords"] == str(keywords_list)].tolist()
+                
+                    title_index = title_index[0]
+                    title = dataframe.loc[title_index,"course_title"]
+                    link = dataframe.loc[title_index, "url"]
+                    price = dataframe.loc[title_index, "price"]
+                    mkeyword.append(keyword)
+        
+        if title != "":
+            matched_keywords["Course Title"].append(title)
+            matched_keywords["matched_values"].append(matched_values)
+            matched_keywords["URL"].append(link)
+            matched_keywords["Price"].append(price)
+                        
+            matched_keywords["matched_keywords"].append(mkeyword)           
                                  
 
 
