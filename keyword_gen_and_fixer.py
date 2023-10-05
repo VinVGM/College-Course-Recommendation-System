@@ -2,6 +2,9 @@ import pandas
 from keybert import KeyBERT
 
 
+def keybert_loader():
+    kw_model = KeyBERT(model='all-mpnet-base-v2')
+    return kw_model
 
 
 

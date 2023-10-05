@@ -1,20 +1,34 @@
 #Import all required modules
-import streamlit as sweb
-import streamlit.components.v1 as sweb_items
+import streamlit as st
+import streamlit.components.v1 as st_items
+
+
+
+
+
 
 
 
 #Website
-sweb.title("College Course Recommendation System")
-user_input = sweb.text_area("What do you want to learn?")
-clicked = sweb.button("Search")
+st.title("College Course Recommendation System")
+col1, col2, col3 = st.columns(3)
+with col1:
+    option = st.selectbox(
+        'Choose a Course Provider',
+        ('Udemy', 'Coursera', 'edX'))
+
+user_input = st.text_input("For which college subject do you want a related course?")
+
+
+clicked = st.button("Search")
 
 import pandas
 import neattext.functions as nt_func
-from keybert import KeyBERT
+
 
 #Loads keybert model for extraction of keywords
 def keybert_loader():
+    from keybert import KeyBERT
     kw_model = KeyBERT(model='all-mpnet-base-v2')
     return kw_model
 
@@ -48,13 +62,15 @@ def keyword_recc_system(user_input, dataframe,csv):
     kw_model = keybert_loader()
     keywords_user = kw_model.extract_keywords(user_input, keyphrase_ngram_range=(1,3), stop_words="english", highlight =False, top_n=10)
     user_input_list = list(dict(keywords_user).keys())
+    print(user_input_list)
             
 
-    matched_keywords= {"Course Title":[],"matched_values" :[],"URL":[],"Price":[]}            
+    matched_keywords= {"Course Title":[],"matched_values" :[],"URL":[],"Price":[], "matched_keywords" : []}            
 
     for skeywords in dataframe['keywords']:
     
         keywords_list = eval(skeywords)
+        
     
         matched_values = 0
     
@@ -77,6 +93,7 @@ def keyword_recc_system(user_input, dataframe,csv):
                 matched_keywords["matched_values"].append(matched_values)
                 matched_keywords["URL"].append(link)
                 matched_keywords["Price"].append(price)
+                matched_keywords["matched_keywords"].append([keyword])
                                  
 
 
@@ -90,13 +107,15 @@ def keyword_recc_system(user_input, dataframe,csv):
     for row in result_dataframe.iterrows():
         
         Title = row[1][0]
-        sweb.write(i,". ",Title)
+        st.write(i,". ",Title)
         Url = row[1][2]
-        sweb.write("Url:",Url)
+        st.write("Url:",Url)
         Price = row[1][3]
-        sweb.write("Price: ",Price,"$")
-        sweb.write("")
+        st.write("Price: ",Price,"$")
+        st.write("")
         i+=1
+    
+    print(result_dataframe)
     
 
 
