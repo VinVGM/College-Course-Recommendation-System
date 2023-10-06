@@ -68,9 +68,9 @@ def data_simlifier(dataframe):
 #Recommendation system based on keyword extraction
 def keyword_recc_system(user_input, dataframe,csv, dataset):
     dataframe = data_simlifier(dataframe)
-   
+    user_input_unmod = user_input
     user_input = user_input.lower()
-
+    
     kw_model = keybert_loader()
     keywords_user = kw_model.extract_keywords(user_input, keyphrase_ngram_range=(1,3), stop_words="english", highlight =False, top_n=10)
     user_input_list = list(dict(keywords_user).keys())
@@ -132,6 +132,8 @@ def keyword_recc_system(user_input, dataframe,csv, dataset):
     #result_dataframe = (pandas.DataFrame(matched_keywords)).sort_values(by=["matched_values"], ascending=False)
     result_dataframe = (pandas.DataFrame(matched_keywords)).sort_values(by=["matched_values"], ascending=False)
     i = 1
+    st.subheader("Course selected: ",)
+    st.subheader(user_input_unmod)
     for row in result_dataframe.iterrows():
         
         Title = row[1][0]
@@ -145,6 +147,7 @@ def keyword_recc_system(user_input, dataframe,csv, dataset):
             st.write("Price: ",Price,"$")
             st.write("")
             i+=1
+    
     
     print(result_dataframe)
     
