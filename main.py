@@ -10,6 +10,7 @@ import streamlit.components.v1 as st_items
 
 
 #Website
+st.set_page_config(page_title="Course Recommendation System")
 st.title("College Course Recommendation System")
 col1, col2, col3 = st.columns(3)
 with col1:
