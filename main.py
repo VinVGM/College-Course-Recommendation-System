@@ -17,10 +17,10 @@ with col1:
         'Choose a Course Provider',
         ('Udemy', 'Coursera', 'edX'))
 
-user_input = st.text_input("For which college subject do you want a related course?")
 
 
-clicked = st.button("Search")
+
+
 
 import pandas
 import neattext.functions as nt_func
@@ -37,6 +37,16 @@ def keybert_loader():
 def csv_reader(csv):
     dataframe = pandas.read_csv(csv)
     return dataframe
+
+clg_course = pandas.read_csv("dataset/ecm_curriculum.csv")
+clg_course_codes = clg_course["course_code"]
+
+clg_option = st.selectbox(
+        "Choose the college course for which you want a third - party course",
+        clg_course_codes
+        
+    )
+
 
 
 
@@ -55,8 +65,9 @@ def data_simlifier(dataframe):
 
 
 #Recommendation system based on keyword extraction
-def keyword_recc_system(user_input, dataframe,csv):
+def keyword_recc_system(user_input, dataframe,csv, dataset):
     dataframe = data_simlifier(dataframe)
+   
     user_input = user_input.lower()
 
     kw_model = keybert_loader()
@@ -64,8 +75,10 @@ def keyword_recc_system(user_input, dataframe,csv):
     user_input_list = list(dict(keywords_user).keys())
     print(user_input_list)
             
-
-    matched_keywords= {"Course Title":[],"matched_values" :[],"URL":[],"Price":[], "matched_keywords" : []}            
+    if dataset == 0 or dataset == 2:
+        matched_keywords= {"Course Title":[],"matched_values" :[],"URL":[],"Price":[], "matched_keywords" : []}
+    if dataset == 1:
+        matched_keywords= {"Course Title":[],"matched_values" :[], "matched_keywords" : []}              
 
     for skeywords in dataframe['keywords']:
     
@@ -88,22 +101,25 @@ def keyword_recc_system(user_input, dataframe,csv):
         for keyword in user_input_list:
             for skeyword in keywords_list:
                 if skeyword == keyword:
-                    print(skeyword, keyword)
+                    
                     matched_values+=1
                     title_index = dataframe.index[dataframe["keywords"] == str(keywords_list)].tolist()
                 
                     title_index = title_index[0]
                     title = dataframe.loc[title_index,"course_title"]
-                    link = dataframe.loc[title_index, "url"]
-                    price = dataframe.loc[title_index, "price"]
+                    if dataset == 0 or dataset == 2:
+                        link = dataframe.loc[title_index, "url"]
+                        price = dataframe.loc[title_index, "price"]
                     mkeyword.append(keyword)
         
         if title != "":
             matched_keywords["Course Title"].append(title)
             matched_keywords["matched_values"].append(matched_values)
-            matched_keywords["URL"].append(link)
-            matched_keywords["Price"].append(price)
-                        
+
+            if dataset == 0 or dataset == 2:
+                matched_keywords["URL"].append(link)
+                matched_keywords["Price"].append(price)
+                            
             matched_keywords["matched_keywords"].append(mkeyword)           
                                  
 
@@ -119,12 +135,15 @@ def keyword_recc_system(user_input, dataframe,csv):
         
         Title = row[1][0]
         st.write(i,". ",Title)
-        Url = row[1][2]
-        st.write("Url:",Url)
-        Price = row[1][3]
-        st.write("Price: ",Price,"$")
-        st.write("")
-        i+=1
+
+        if dataset == 0 or dataset == 2:
+
+            Url = row[1][2]
+            st.write("Url:",Url)
+            Price = row[1][3]
+            st.write("Price: ",Price,"$")
+            st.write("")
+            i+=1
     
     print(result_dataframe)
     
@@ -133,21 +152,38 @@ def keyword_recc_system(user_input, dataframe,csv):
 
 
  
-
-
-
-csv = "courses_with_keywords_test.csv"
-dataframe = csv_reader(csv)
+clicked = st.button("Search")
 
 
 
 
+
+
+
+
+if option == "Udemy":
+    csv = "dataset/udemy_courses.csv"
+    dataframe = csv_reader(csv)
+    dataset = 0
+if option == "Coursera":
+    csv = "dataset/coursea_data.csv"
+    dataframe = csv_reader(csv)
+    dataset = 1
+if option == "edX":
+    csv = "dataset/edx_courses.csv"
+    dataframe = csv_reader(csv)
+    dataset = 2
 
 
 
 
 if clicked == True:
-    dataframe = keyword_recc_system(user_input,dataframe,csv)
+    c_index = clg_course.index[clg_course["course_code"] == clg_option].tolist()
+    c_index = c_index[0]
+    
+    user_input = clg_course._get_value(c_index,"course_title")
+    print(user_input)
+    dataframe = keyword_recc_system(user_input,dataframe,csv,dataset)
     dataframe
 
 

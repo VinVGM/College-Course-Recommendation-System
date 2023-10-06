@@ -1,16 +1,25 @@
 import pandas
 from keybert import KeyBERT
+import neattext.functions as nt_func
 
 
 def keybert_loader():
     kw_model = KeyBERT(model='all-mpnet-base-v2')
     return kw_model
 
+def data_simlifier(dataframe):
+    dataframe["Simplified_Title"] = dataframe["course_title"].apply(nt_func.remove_stopwords)
+    dataframe["Simplified_Title"] = dataframe["Simplified_Title"].apply(nt_func.remove_special_characters)
+    dataframe["Simplified_Title"] = dataframe['Simplified_Title'].str.lower()
+    dataframe["course_title_l"] = dataframe["course_title"].str.lower()
+    return dataframe 
+
 
 
 #Generates keywords in empty cells if the keyword_gen misses to fill empty cells
 def keyword_fixer(dataframe, csv):
     kw_model = keybert_loader()
+    
     i=0
     for keyword_list in dataframe['keywords']:
         try:
@@ -29,6 +38,7 @@ def keyword_fixer(dataframe, csv):
 #Generates keywords
 def keyword_gen(dataframe,csv):
     kw_model = keybert_loader()
+    dataframe = data_simlifier(dataframe)
     dataframe['keywords'] = ""
     allkey_list = []
     for title in dataframe["course_title_l"]:
