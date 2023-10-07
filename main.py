@@ -1,6 +1,7 @@
 #Import all required modules
 import streamlit as st
 import streamlit.components.v1 as st_items
+import base64
 
 
 
@@ -13,15 +14,28 @@ import streamlit.components.v1 as st_items
 
 st.set_page_config(page_title="Course Recommendation System", layout="wide")
 
+page_element="""
+<style>
+[data-testid="stAppViewContainer"]{
+  
+    background-image: url("https://images.pexels.com/photos/5905709/pexels-photo-5905709.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1");
+    background-size: cover;  
+}
+
+
+
+</style>
+"""
+
+st.markdown(page_element, unsafe_allow_html=True)
+
 st.markdown("""
 <style>
 	[data-testid="stDecoration"] {
 		display: none;
 	}
 
-    body {
-    background-image: url('images/bg.jpg');
-    }
+
 
 
 </style>""",
