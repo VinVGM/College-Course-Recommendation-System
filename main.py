@@ -10,13 +10,35 @@ import streamlit.components.v1 as st_items
 
 
 #Website
-st.set_page_config(page_title="Course Recommendation System")
+
+st.set_page_config(page_title="Course Recommendation System", layout="wide")
+
+st.markdown("""
+<style>
+	[data-testid="stDecoration"] {
+		display: none;
+	}
+
+    body {
+    background-image: url('images/bg.jpg');
+    }
+
+
+</style>""",
+unsafe_allow_html=True)
+
 st.title("College Course Recommendation System")
-col1, col2, col3 = st.columns(3)
+st.markdown("#")
+col1,colmid, col2 = st.columns([0.4,0.1,0.5]) 
+
 with col1:
     option = st.selectbox(
         'Choose a Course Provider',
-        ('Udemy', 'Coursera', 'edX'))
+        ('edX', 'Coursera', 'Udemy'))
+    
+
+    
+
 
 
 
@@ -26,6 +48,36 @@ with col1:
 import pandas
 import neattext.functions as nt_func
 
+#Create a dataframe reading the csv file dataset
+def csv_reader(csv):
+    dataframe = pandas.read_csv(csv)
+    return dataframe
+
+
+if option == "Udemy":
+    csv = "dataset/udemy_courses.csv"
+    dataframe = csv_reader(csv)
+    dataset = 0
+    with col2:
+        st.image("images/udemy.png", width= 200)
+if option == "Coursera":
+    csv = "dataset/coursea_data.csv"
+    dataframe = csv_reader(csv)
+    dataset = 1
+    with col1:
+        st.markdown("#")
+        st.write("Please Note: Price list is not available for courses offered by Coursera. please visit the website to know more about it")
+        st.markdown("#")
+    with col2:
+        st.image("images/coursera.png", width = 200)
+
+if option == "edX":
+    csv = "dataset/edx_courses.csv"
+    dataframe = csv_reader(csv)
+    dataset = 2
+    with col2:
+        st.image("images/edx.png", width = 100)
+
 
 #Loads keybert model for extraction of keywords
 def keybert_loader():
@@ -34,19 +86,16 @@ def keybert_loader():
     return kw_model
 
 
-#Create a dataframe reading the csv file dataset
-def csv_reader(csv):
-    dataframe = pandas.read_csv(csv)
-    return dataframe
+
 
 clg_course = pandas.read_csv("dataset/ecm_curriculum.csv")
 clg_course_codes = clg_course["course_code"]
-
-clg_option = st.selectbox(
-        "Choose the college course for which you want a third - party course",
-        clg_course_codes
-        
-    )
+with col1:
+    clg_option = st.selectbox(
+            "Choose the college course for which you want a third - party course",
+            clg_course_codes
+            
+        )
 
 
 
@@ -79,7 +128,7 @@ def keyword_recc_system(user_input, dataframe,csv, dataset):
     if dataset == 0 or dataset == 2:
         matched_keywords= {"Course Title":[],"matched_values" :[],"URL":[],"Price":[], "matched_keywords" : []}
     if dataset == 1:
-        matched_keywords= {"Course Title":[],"matched_values" :[], "matched_keywords" : []}              
+        matched_keywords= {"Course Title":[],"matched_values" :[], "URL": [] , "matched_keywords" : [], }              
 
     for skeywords in dataframe['keywords']:
     
@@ -116,12 +165,18 @@ def keyword_recc_system(user_input, dataframe,csv, dataset):
         if title != "":
             matched_keywords["Course Title"].append(title)
             matched_keywords["matched_values"].append(matched_values)
+            if dataset == 1:
+                slink = "https://www.coursera.org/search?query="
+                link = slink + title.replace(" ", "%20")
+                matched_keywords["URL"].append(link)
 
             if dataset == 0 or dataset == 2:
                 matched_keywords["URL"].append(link)
                 matched_keywords["Price"].append(price)
                             
-            matched_keywords["matched_keywords"].append(mkeyword)           
+            matched_keywords["matched_keywords"].append(mkeyword)
+
+                  
                                  
 
 
@@ -131,32 +186,48 @@ def keyword_recc_system(user_input, dataframe,csv, dataset):
 
     #result_dataframe = (pandas.DataFrame(matched_keywords)).sort_values(by=["matched_values"], ascending=False)
     result_dataframe = (pandas.DataFrame(matched_keywords)).sort_values(by=["matched_values"], ascending=False)
+
     i = 1
-    st.subheader("Course selected: ",)
-    st.subheader(user_input_unmod)
+    
     for row in result_dataframe.iterrows():
         
-        Title = row[1][0]
-        st.write(i,". ",Title)
-
-        if dataset == 0 or dataset == 2:
-
-            Url = row[1][2]
-            st.write("Url:",Url)
-            Price = row[1][3]
-            st.write("Price: ",Price,"$")
-            st.write("")
-            i+=1
-    
+        with col2:
+            
+                if dataset == 1:
+                    Title = row[1][0]
+                    st.write(i,". ",Title)
+                    
+                    
+                    Url = row[1][2]
+                    st.write("Url: ", Url)
+                    
+                    i+=1
+                if dataset == 0 or dataset == 2:
+                    with col2:
+                        Title = row[1][0]
+                        st.write(i,". ",Title)
+                        Url = row[1][2]
+                        st.write("Url: ",Url)
+                        Price = row[1][3]
+                        st.write("Price: ",Price,"$")
+                        st.write("")
+                        i+=1
+    if matched_values == 0:
+        with col2:
+            st.write("Courses not found. Please choose a different course provider")
     
     print(result_dataframe)
+
+    
+    
+    
     
 
 
 
 
- 
-clicked = st.button("Search")
+with col1: 
+    clicked = st.button("Search")
 
 
 
@@ -165,18 +236,7 @@ clicked = st.button("Search")
 
 
 
-if option == "Udemy":
-    csv = "dataset/udemy_courses.csv"
-    dataframe = csv_reader(csv)
-    dataset = 0
-if option == "Coursera":
-    csv = "dataset/coursea_data.csv"
-    dataframe = csv_reader(csv)
-    dataset = 1
-if option == "edX":
-    csv = "dataset/edx_courses.csv"
-    dataframe = csv_reader(csv)
-    dataset = 2
+
 
 
 
@@ -187,8 +247,9 @@ if clicked == True:
     
     user_input = clg_course._get_value(c_index,"course_title")
     print(user_input)
-    dataframe = keyword_recc_system(user_input,dataframe,csv,dataset)
-    dataframe
+    keyword_recc_system(user_input,dataframe,csv,dataset)
+    
+    
 
 
 
