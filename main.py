@@ -14,38 +14,14 @@ import base64
 
 st.set_page_config(page_title="Course Recommendation System", layout="wide")
 
-page_element="""
-<style>
-[data-testid="stAppViewContainer"]{
-  
-    background-image: url("https://images.pexels.com/photos/5905709/pexels-photo-5905709.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1");
-    background-size: cover;  
-}
-
-
-
-</style>
-"""
-
-st.markdown(page_element, unsafe_allow_html=True)
-
-st.markdown("""
-<style>
-	[data-testid="stDecoration"] {
-		display: none;
-	}
-
-
-
-
-</style>""",
-unsafe_allow_html=True)
+#
 
 st.title("College Course Recommendation System")
 st.markdown("#")
-col1,colmid, col2 = st.columns([0.4,0.1,0.5]) 
+col1,colmid, col2 = st.columns([0.3,0.4,0.3]) 
 
 with col1:
+   
     option = st.selectbox(
         'Choose a Course Provider',
         ('edX', 'Coursera', 'Udemy'))
@@ -105,6 +81,7 @@ def keybert_loader():
 clg_course = pandas.read_csv("dataset/ecm_curriculum.csv")
 clg_course_codes = clg_course["course_code"]
 with col1:
+
     clg_option = st.selectbox(
             "Choose the college course for which you want a third - party course",
             clg_course_codes
@@ -232,16 +209,128 @@ def keyword_recc_system(user_input, dataframe,csv, dataset):
     
     print(result_dataframe)
 
+
+##recommended materials
+mdataframe = pandas.read_csv("dataset\materials.csv")
+def material_find(user_input, dataframe):
+    mlist = []
+    for i in dataframe["c_title"]:
+        mlist.append(i)
+
+    if user_input in mlist:
+        print(user_input)
+        index = dataframe.index[dataframe["c_title"] == user_input]
+        index = index[0]
+        
+        material =  dataframe.loc[index, "materials"]
+
+        if material == None:
+            return None
+        else:
+            return material
+
+
+#community contribution     
+def material_adder(ctitle,material, csv):
+    clist = []
+    
+    dataframe = pandas.read_csv(csv)
+    for i in dataframe["c_title"]:
+        clist.append(i)
+    print(clist)
+    if ctitle in clist:
+        index = dataframe.index[dataframe["c_title"] == ctitle]
+        index = index[0]
+        
+        mlist = eval(dataframe.loc[index, "materials"])
+        
+    else:
+        ilist = []
+        for i in dataframe["index"]:
+            
+            ilist.append(i)
+        
+        indexa = ilist[-1]
+        df2 = pandas.DataFrame({"index": [indexa+1], "c_title":[ctitle],
+               "materials": [str([material])]
+               })
+        
+        dataframe = dataframe._append(df2, ignore_index=True)
+        index = dataframe.index[dataframe["c_title"] == ctitle]
+        
+        index = index[0]
+        print(index)
+        
+        mlist = eval(dataframe.loc[index, "materials"])
+        
+    
+    mlist.append(material)
+    dataframe.at[index, "materials"] = str(mlist)
+    dataframe.to_csv("dataset\materials.csv")
+    print("lmao")
+    return dataframe
+    
+
+
     
     
     
     
+    
+    
 
 
 
 
-with col1: 
-    clicked = st.button("Search")
+with col1:
+    
+    
+    clickedsearch = st.button("Search")
+
+with col1:
+    st.divider()
+    st.write("Add materials for this course")
+    
+    with col1:
+        
+        user_materials = st.text_input("Enter the link for the materials")
+            
+        clickedadd = st.button("Add")
+        if clickedadd == True:
+            print("lmao")
+            material_adder(clg_option, user_materials, "dataset\materials.csv")
+                
+                
+
+                
+                
+
+        
+
+    
+with colmid:
+    st.divider()
+    st.write("Recommended Course Materials:")
+    
+    
+    materials = material_find(clg_option, mdataframe)
+    if materials == None:
+        st.write("None Available")
+        pass
+    else:
+        mlist = eval(materials)
+
+        i = 1
+        for material in mlist:
+            st.write(i, ":", material)
+            
+   
+
+        
+    
+  
+    
+    
 
 
 
@@ -255,7 +344,8 @@ with col1:
 
 
 
-if clicked == True:
+
+if clickedsearch == True:
     c_index = clg_course.index[clg_course["course_code"] == clg_option].tolist()
     c_index = c_index[0]
     
@@ -263,6 +353,8 @@ if clicked == True:
     print(user_input)
     keyword_recc_system(user_input,dataframe,csv,dataset)
     
+
+
     
 
 
