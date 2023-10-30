@@ -211,7 +211,7 @@ def keyword_recc_system(user_input, dataframe,csv, dataset):
 
 
 ##recommended materials
-mdataframe = pandas.read_csv("dataset\materials.csv")
+mdataframe = pandas.read_csv("dataset/materials.csv")
 def material_find(user_input, dataframe):
     mlist = []
     for i in dataframe["c_title"]:
@@ -266,7 +266,7 @@ def material_adder(ctitle,material, csv):
     
     mlist.append(material)
     dataframe.at[index, "materials"] = str(mlist)
-    dataframe.to_csv("dataset\materials.csv")
+    dataframe.to_csv("dataset/materials.csv")
     print("lmao")
     return dataframe
     
@@ -298,7 +298,7 @@ with col1:
         clickedadd = st.button("Add")
         if clickedadd == True:
             print("lmao")
-            material_adder(clg_option, user_materials, "dataset\materials.csv")
+            material_adder(clg_option, user_materials, "dataset/materials.csv")
                 
                 
 
