@@ -21,7 +21,10 @@ st.markdown("#")
 col1,colmid, col2 = st.columns([0.3,0.4,0.3]) 
 
 with col1:
-   
+    optiondept = st.selectbox(
+        "Choose Your Branch",
+        ('Electronics and Computer Engineering','Electronics and Communication Engineering','Electronics Engineering: VLSI Design')
+    )
     option = st.selectbox(
         'Choose a Course Provider',
         ('edX', 'Coursera', 'Udemy'))
@@ -42,6 +45,13 @@ import neattext.functions as nt_func
 def csv_reader(csv):
     dataframe = pandas.read_csv(csv)
     return dataframe
+
+if optiondept =="Electronics and Computer Engineering":
+    clg_course = csv_reader("dataset/ecm_curriculum.csv")
+if optiondept == "Electronics and Communication Engineering":
+    clg_course = csv_reader("dataset/ece_curriculum.csv")
+if optiondept == "Electronics Engineering: VLSI Design":
+    clg_course = csv_reader("dataset/vlsi__curriculum.csv")
 
 
 if option == "Udemy":
@@ -78,7 +88,7 @@ def keybert_loader():
 
 
 
-clg_course = pandas.read_csv("dataset/ecm_curriculum.csv")
+#clg_course = pandas.read_csv("dataset/ecm_curriculum.csv")
 clg_course_codes = clg_course["course_code"]
 with col1:
 
@@ -166,6 +176,8 @@ def keyword_recc_system(user_input, dataframe,csv, dataset):
                 matched_keywords["Price"].append(price)
                             
             matched_keywords["matched_keywords"].append(mkeyword)
+            print(matched_keywords)
+            
 
                   
                                  
@@ -203,11 +215,12 @@ def keyword_recc_system(user_input, dataframe,csv, dataset):
                         st.write("Price: ",Price,"$")
                         st.write("")
                         i+=1
-    if matched_values == 0:
+    if matched_keywords["matched_values"] == []:
         with col2:
             st.write("Courses not found. Please choose a different course provider")
     
     print(result_dataframe)
+    
 
 
 ##recommended materials
