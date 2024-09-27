@@ -7,8 +7,8 @@ The website currently supports all the subjects in the courses offered by SENSE 
 Shows the list of courses offered by edX, Coursera and Udemy.
 Dataset - Courtesy of KAGGLE.
 
-#Requirements
-Streamlit Module
-NeatText Module
-KeyBert Module
+## Requirements
+* Streamlit Module
+* NeatText Module
+* KeyBert Module
 
