@@ -17,7 +17,3 @@ Live Version Implemented at: https://vgm-clg-recom-sys.streamlit.app/
 * NeatText Module
 * KeyBert Module
 
-## Contributors
-* Pranesh Shivaachalam R M
-* Muthuram M
-
